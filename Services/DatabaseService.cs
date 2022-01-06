@@ -8,11 +8,11 @@ namespace OptimaTrackerWebService.Services
 {
     public class DatabaseService
     {
-        public void Insert(EventModel Event)
+        public void Insert(CompanyModel company)
         {
-            Console.WriteLine(Event.SerialKey);
-            Console.WriteLine(Event.TIN);
-            Console.WriteLine(Event.Events);
+            Console.WriteLine(company.SerialKey);
+            Console.WriteLine(company.TIN);
+            Console.WriteLine(company.Events);
         }
     }
 }

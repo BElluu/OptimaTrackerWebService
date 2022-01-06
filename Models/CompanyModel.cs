@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace OptimaTrackerWebService.Models
 {
-    public class EventModel
+    public class CompanyModel
     {
         public string SerialKey { get; set; }
         public string TIN { get; set; }
