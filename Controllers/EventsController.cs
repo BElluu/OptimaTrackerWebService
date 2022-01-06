@@ -16,11 +16,10 @@ namespace OptimaTrackerWebService.Controllers
     {
         // POST api/<EventsController>
         [HttpPost]
-        public void Post([FromBody] EventModel value)
+        public void Post([FromBody] CompanyModel companyData)
         {
-            //var jsonService = new JsonService();
             var databaseService = new DatabaseService();
-            databaseService.Insert(value);
+            databaseService.Insert(companyData);
         }
 
         [HttpGet]
