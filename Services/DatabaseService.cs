@@ -12,7 +12,11 @@ namespace OptimaTrackerWebService.Services
         {
             Console.WriteLine(company.SerialKey);
             Console.WriteLine(company.TIN);
-            Console.WriteLine(company.Events);
+            foreach(var abc in company.Events)
+            {
+                Console.WriteLine(abc.ProcedureId);
+                Console.WriteLine(abc.NumberOfOccurrences);
+            }
         }
     }
 }
