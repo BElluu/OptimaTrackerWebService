@@ -5,16 +5,14 @@ using System.Threading.Tasks;
 
 namespace OptimaTrackerWebService.Models
 {
-    public class CompanyModel
+    public class Company
     {
+        public int Id { get; set; }
         public string SerialKey { get; set; }
         public string TIN { get; set; }
-        public Event []Events { get; set; }
-    }
 
-    public class Event
-    {
-        public string ProcedureId { get; set; }
-        public int NumberOfOccurrences { get; set; }
+        public virtual List<Event> Events { get; set; }
+
+       // public Event Event { get; set; }
     }
 }

@@ -14,12 +14,17 @@ namespace OptimaTrackerWebService.Controllers
     [ApiController]
     public class EventsController : ControllerBase
     {
+        private readonly IDatabaseService service;
+        public EventsController(IDatabaseService databaseService)
+        {
+            service = databaseService;
+        }
         // POST api/<EventsController>
         [HttpPost]
-        public void Post([FromBody] CompanyModel companyData)
+        public void Post([FromBody] Company trackData)
         {
-            var databaseService = new DatabaseService();
-            databaseService.Insert(companyData);
+            
+            service.Insert(trackData);
         }
 
         [HttpGet]

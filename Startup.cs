@@ -7,6 +7,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using OptimaTrackerWebService.Database;
+using OptimaTrackerWebService.Models;
+using OptimaTrackerWebService.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,6 +35,8 @@ namespace OptimaTrackerWebService
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "OptimaTrackerWebService", Version = "v1" });
             });
+            services.AddDbContext<DatabaseContext>();
+            services.AddScoped<IDatabaseService, DatabaseService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
