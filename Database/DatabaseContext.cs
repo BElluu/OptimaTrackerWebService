@@ -50,11 +50,11 @@ namespace OptimaTrackerWebService.Database
             {
                 d.ToTable("EventsDict");
                 d.HasData(
-                    new EventDict { ProcedureId = "Logowanie", ProcedureDescription = "Okno logowania" },
-                    new EventDict { ProcedureId = "BazLista", ProcedureDescription = "Okno listy baz danych" },
-                    new EventDict { ProcedureId = "KreatorBazy", ProcedureDescription = "Wizard bazy danych" },
-                    new EventDict { ProcedureId = "CfgStanowiskoOgolneParametry", ProcedureDescription = "Ustawienia ogolne stanowiska" },
-                    new EventDict { ProcedureId = "CfgSerwisOperacjiAutomatycznych", ProcedureDescription = "Ustawienia Serwisu Operacji Automatycznych" });
+                    new EventDict { Id = 1, ProcedureId = "Logowanie", ProcedureDescription = "Okno logowania" },
+                    new EventDict { Id = 2, ProcedureId = "BazLista", ProcedureDescription = "Okno listy baz danych" },
+                    new EventDict { Id = 3, ProcedureId = "KreatorBazy", ProcedureDescription = "Wizard bazy danych" },
+                    new EventDict { Id = 4, ProcedureId = "CfgStanowiskoOgolneParametry", ProcedureDescription = "Ustawienia ogolne stanowiska" },
+                    new EventDict { Id = 5, ProcedureId = "CfgSerwisOperacjiAutomatycznych", ProcedureDescription = "Ustawienia Serwisu Operacji Automatycznych" });
             });
         }
 
