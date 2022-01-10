@@ -1,21 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using OptimaTrackerWebService.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace OptimaTrackerWebService.Database
 {
-    public class DatabaseContext: DbContext
+    public class DatabaseContext : DbContext
     {
         private readonly IConfiguration configuration;
         public DatabaseContext(IConfiguration config)
         {
             configuration = config;
         }
-        //public DbSet<Track> Track { get; set; }
         public DbSet<Company> companies { get; set; }
         public DbSet<Event> events { get; set; }
         public DbSet<EventDict> eventsDict { get; set; }
@@ -36,14 +31,6 @@ namespace OptimaTrackerWebService.Database
                 .WithOne(co => co.Company)
                 .IsRequired();
             });
-            /*                .Property(c => c.Id)
-                            .ValueGeneratedOnAdd()
-                            .UseIdentityColumn()
-                            .IsRequired();*/
-            /*            modelBuilder.Entity<Company>()
-                            .HasMany(c => c.Events)
-                            .WithOne(e => e.Company)
-                            .IsRequired();*/
 
             // Event
 
@@ -62,12 +49,17 @@ namespace OptimaTrackerWebService.Database
             modelBuilder.Entity<EventDict>(d =>
             {
                 d.ToTable("EventsDict");
+                d.HasData(
+                    new EventDict { ProcedureId = "Logowanie", ProcedureDescription = "Okno logowania" },
+                    new EventDict { ProcedureId = "BazLista", ProcedureDescription = "Okno listy baz danych" },
+                    new EventDict { ProcedureId = "KreatorBazy", ProcedureDescription = "Wizard bazy danych" },
+                    new EventDict { ProcedureId = "CfgStanowiskoOgolneParametry", ProcedureDescription = "Ustawienia ogolne stanowiska" },
+                    new EventDict { ProcedureId = "CfgSerwisOperacjiAutomatycznych", ProcedureDescription = "Ustawienia Serwisu Operacji Automatycznych" });
             });
         }
 
-        protected override void OnConfiguring (DbContextOptionsBuilder optionsBuilder)
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            //optionsBuilder.UseNpgsql(@"Server=localhost;Port=5432;Database=OptimaTrackerDb;User Id=OptimaTrackerUser;Password=optima;");
             optionsBuilder.UseNpgsql(configuration["ConnectionStrings:OptimaTrackerAppConnection"]);
         }
 
