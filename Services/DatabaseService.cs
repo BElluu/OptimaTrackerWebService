@@ -1,13 +1,11 @@
 ﻿using OptimaTrackerWebService.Database;
 using OptimaTrackerWebService.Models;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace OptimaTrackerWebService.Services
 {
-    public class DatabaseService: IDatabaseService
+    public class DatabaseService : IDatabaseService
     {
         private readonly DatabaseContext dbContext;
 
@@ -15,6 +13,7 @@ namespace OptimaTrackerWebService.Services
         {
             dbContext = optimaTrackerContext;
         }
+
         public void Insert(Company data)
         {
             /*            Console.WriteLine(data.SerialKey);
@@ -24,7 +23,24 @@ namespace OptimaTrackerWebService.Services
                             Console.WriteLine(abc.ProcedureId);
                             Console.WriteLine(abc.NumberOfOccurrences);
                         }*/
+            try
+            {
+                if (!SerialKeyExists(data.SerialKey))
+                    InsertCompanyData(data);
 
+                int companyId = GetCompanyId(data.SerialKey);
+                InsertEventsData(data, companyId);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                //TODO Save JSON file here
+            }
+        }
+
+        private void InsertCompanyData(Company data)
+        {
             var companyData = new Company
             {
                 SerialKey = data.SerialKey,
@@ -32,66 +48,58 @@ namespace OptimaTrackerWebService.Services
             };
             dbContext.companies.Add(companyData);
             dbContext.SaveChanges();
+        }
 
-            foreach(var abc in data.Events)
+        private void InsertEventsData(Company data, int companyId)
+        {
+            foreach (var abc in data.Events)
             {
-                var eventData = new Event
+                var eventDefinitionId = GetEventDefinitionId(abc.ProcedureId);
+                if (eventDefinitionId != 0)
                 {
-                    ProcedureId = abc.ProcedureId,
-                    NumberOfOccurrences = abc.NumberOfOccurrences
-
-                };
-                dbContext.events.Add(eventData);
-                dbContext.SaveChanges();
-            }
-
-/*            using (var context = new DatabaseContext())
-            {
-                context.companies.Add(new Company
-                {
-                    SerialKey = data.SerialKey,
-                    TIN = data.TIN
-                });
-                context.SaveChanges();
-            }
-
-            using (var context = new DatabaseContext())
-            {
-                foreach (var abc in data.Events) {
-                    context.events.Add(new Event
+                    var eventData = new Event
                     {
-                        ProcedureId = abc.ProcedureId,
-                        NumberOfOccurrences = abc.NumberOfOccurrences
-                   });
-                    context.SaveChanges();
+                        ProcedureIdentity = eventDefinitionId,
+                        NumberOfOccurrences = abc.NumberOfOccurrences,
+                        CompanyId = companyId,
+                        TimeStamp = DateTime.Today
+
+                    };
+                    dbContext.events.Add(eventData);
+                    dbContext.SaveChanges();
                 }
-            }*/
-
-/*            using (var context = new DatabaseContext())
-            {
-                foreach (var abc in data.Events)
+                else
                 {
-                    context.companies.Add(new Company
-                    {
-                        SerialKey = data.SerialKey,
-                        TIN = data.TIN,
-                        Events = new List<Event>()
-                        {
-                            new Event {ProcedureId = abc.ProcedureId, NumberOfOccurrences = abc.NumberOfOccurrences}
-                        }
-                    });*/
-/*                    context.Track.Add(new Track
-                    {
-                        SerialKey = data.SerialKey,
-                        TIN = data.TIN,
-                        Events = new List<Event>()
-                                    {
-                                       new Event{ ProcedureId = abc.ProcedureId, NumberOfOccurrences = abc.NumberOfOccurrences}
-                                    }
-                    });
-                    context.SaveChanges();*/
+                    Console.WriteLine(abc.ProcedureId + " do not exists in events dictionary");
                 }
             }
         }
-/*    }
-}*/
+
+        private bool SerialKeyExists(string serialKey)
+        {
+            string GetSerialKey = dbContext.companies.Where(c => c.SerialKey == serialKey).Select(c => c.SerialKey).SingleOrDefault();
+
+            if (GetSerialKey == serialKey)
+                return true;
+
+            return false;
+        }
+        private int GetCompanyId(string serialKey)
+        {
+            int companyId = dbContext
+                .companies.Where(c => c.SerialKey == serialKey)
+                .Select(c => c.Id)
+                .SingleOrDefault();
+
+            return companyId;
+        }
+
+        private int GetEventDefinitionId(string procedureId)
+        {
+            int eventDefinitionId = dbContext.eventsDict.Where(d => d.ProcedureId == procedureId).Select(d => d.Id).SingleOrDefault();
+
+            return eventDefinitionId;
+        }
+    }
+}
+

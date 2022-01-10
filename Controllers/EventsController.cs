@@ -21,10 +21,10 @@ namespace OptimaTrackerWebService.Controllers
         }
         // POST api/<EventsController>
         [HttpPost]
-        public void Post([FromBody] Company trackData)
+        public void Post([FromBody] Company data)
         {
             
-            service.Insert(trackData);
+            service.Insert(data);
         }
 
         [HttpGet]

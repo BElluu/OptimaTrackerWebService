@@ -18,6 +18,7 @@ namespace OptimaTrackerWebService.Database
         //public DbSet<Track> Track { get; set; }
         public DbSet<Company> companies { get; set; }
         public DbSet<Event> events { get; set; }
+        public DbSet<EventDict> eventsDict { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -29,6 +30,8 @@ namespace OptimaTrackerWebService.Database
                  .ValueGeneratedOnAdd()
                  .UseIdentityColumn()
                  .IsRequired();
+                c.HasIndex(co => co.SerialKey)
+                .IsUnique();
                 c.HasMany(e => e.Events)
                 .WithOne(co => co.Company)
                 .IsRequired();
@@ -50,6 +53,15 @@ namespace OptimaTrackerWebService.Database
                 e.HasOne(c => c.Company)
                 .WithMany(ev => ev.Events)
                 .HasForeignKey(c => c.CompanyId);
+                e.Property(ev => ev.ProcedureIdentity).HasColumnName("ProcedureId");
+                e.Ignore(ev => ev.ProcedureId);
+            });
+
+            // Events Dict
+
+            modelBuilder.Entity<EventDict>(d =>
+            {
+                d.ToTable("EventsDict");
             });
         }
 
