@@ -1,19 +1,11 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using OptimaTrackerWebService.Database;
-using OptimaTrackerWebService.Models;
 using OptimaTrackerWebService.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace OptimaTrackerWebService
 {
@@ -37,6 +29,13 @@ namespace OptimaTrackerWebService
             });
             services.AddDbContext<DatabaseContext>();
             services.AddScoped<IDatabaseService, DatabaseService>();
+            services.AddScoped<IJsonService, JsonService>();
+
+            //Fix for date in .NET 6 with EF
+            // https://github.com/npgsql/efcore.pg/issues/2000
+
+            System.AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

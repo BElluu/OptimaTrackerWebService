@@ -8,23 +8,19 @@ namespace OptimaTrackerWebService.Services
     public class DatabaseService : IDatabaseService
     {
         private readonly DatabaseContext dbContext;
+        private readonly IJsonService json;
 
-        public DatabaseService(DatabaseContext optimaTrackerContext)
+        public DatabaseService(DatabaseContext optimaTrackerContext, IJsonService jsonService)
         {
             dbContext = optimaTrackerContext;
+            json = jsonService;
         }
 
         public void Insert(Company data)
         {
-            /*            Console.WriteLine(data.SerialKey);
-                        Console.WriteLine(data.TIN);
-                        foreach (var abc in data.Events)
-                        {
-                            Console.WriteLine(abc.ProcedureId);
-                            Console.WriteLine(abc.NumberOfOccurrences);
-                        }*/
             try
             {
+                //throw new Exception("Test Exception");
                 if (!SerialKeyExists(data.SerialKey))
                     InsertCompanyData(data);
 
@@ -35,7 +31,8 @@ namespace OptimaTrackerWebService.Services
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                //TODO Save JSON file here
+                json.CreateJsonFromObject(data);
+
             }
         }
 
