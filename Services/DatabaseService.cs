@@ -1,22 +1,102 @@
-﻿using OptimaTrackerWebService.Models;
+﻿using OptimaTrackerWebService.Database;
+using OptimaTrackerWebService.Models;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace OptimaTrackerWebService.Services
 {
-    public class DatabaseService
+    public class DatabaseService : IDatabaseService
     {
-        public void Insert(CompanyModel company)
+        private readonly DatabaseContext dbContext;
+        private readonly IJsonService json;
+
+        public DatabaseService(DatabaseContext optimaTrackerContext, IJsonService jsonService)
         {
-            Console.WriteLine(company.SerialKey);
-            Console.WriteLine(company.TIN);
-            foreach(var abc in company.Events)
+            dbContext = optimaTrackerContext;
+            json = jsonService;
+        }
+
+        public void Insert(Company data)
+        {
+            try
             {
-                Console.WriteLine(abc.ProcedureId);
-                Console.WriteLine(abc.NumberOfOccurrences);
+                //throw new Exception("Test Exception");
+                if (!SerialKeyExists(data.SerialKey))
+                    InsertCompanyData(data);
+
+                int companyId = GetCompanyId(data.SerialKey);
+                InsertEventsData(data, companyId);
+
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                json.CreateJsonFromObject(data);
+
+            }
+        }
+
+        private void InsertCompanyData(Company data)
+        {
+            var companyData = new Company
+            {
+                SerialKey = data.SerialKey,
+                TIN = data.TIN
+            };
+            dbContext.companies.Add(companyData);
+            dbContext.SaveChanges();
+        }
+
+        private void InsertEventsData(Company data, int companyId)
+        {
+            foreach (var abc in data.Events)
+            {
+                var eventDefinitionId = GetEventDefinitionId(abc.ProcedureId);
+                if (eventDefinitionId != 0)
+                {
+                    var eventData = new Event
+                    {
+                        ProcedureIdentity = eventDefinitionId,
+                        NumberOfOccurrences = abc.NumberOfOccurrences,
+                        CompanyId = companyId,
+                        TimeStamp = DateTime.Today
+
+                    };
+                    dbContext.events.Add(eventData);
+                    dbContext.SaveChanges();
+                }
+                else
+                {
+                    Console.WriteLine(abc.ProcedureId + " do not exists in events dictionary");
+                }
+            }
+        }
+
+        private bool SerialKeyExists(string serialKey)
+        {
+            string GetSerialKey = dbContext.companies.Where(c => c.SerialKey == serialKey).Select(c => c.SerialKey).SingleOrDefault();
+
+            if (GetSerialKey == serialKey)
+                return true;
+
+            return false;
+        }
+        private int GetCompanyId(string serialKey)
+        {
+            int companyId = dbContext
+                .companies.Where(c => c.SerialKey == serialKey)
+                .Select(c => c.Id)
+                .SingleOrDefault();
+
+            return companyId;
+        }
+
+        private int GetEventDefinitionId(string procedureId)
+        {
+            int eventDefinitionId = dbContext.eventsDict.Where(d => d.ProcedureId == procedureId).Select(d => d.Id).SingleOrDefault();
+
+            return eventDefinitionId;
         }
     }
 }
+
