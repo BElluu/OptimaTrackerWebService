@@ -1,7 +1,9 @@
-﻿using OptimaTrackerWebService.Database;
+﻿using Microsoft.Extensions.Configuration;
+using OptimaTrackerWebService.Database;
 using OptimaTrackerWebService.Models;
 using System;
 using System.Linq;
+using System.Xml.Linq;
 
 namespace OptimaTrackerWebService.Services
 {
@@ -9,11 +11,13 @@ namespace OptimaTrackerWebService.Services
     {
         private readonly DatabaseContext dbContext;
         private readonly IJsonService json;
+        private readonly IConfiguration configuration;
 
-        public DatabaseService(DatabaseContext optimaTrackerContext, IJsonService jsonService)
+        public DatabaseService(DatabaseContext optimaTrackerContext, IJsonService jsonService, IConfiguration config)
         {
             dbContext = optimaTrackerContext;
             json = jsonService;
+            configuration = config;
         }
 
         public void Insert(Company data)
@@ -51,12 +55,12 @@ namespace OptimaTrackerWebService.Services
         {
             foreach (var abc in data.Events)
             {
-                var eventDefinitionId = GetEventDefinitionId(abc.ProcedureId);
+                var eventDefinitionId = GetEventDefinitionId(abc.ProcedureName);
                 if (eventDefinitionId != 0)
                 {
                     var eventData = new Event
                     {
-                        ProcedureIdentity = eventDefinitionId,
+                        ProcedureId = eventDefinitionId,
                         NumberOfOccurrences = abc.NumberOfOccurrences,
                         CompanyId = companyId,
                         TimeStamp = DateTime.Today
@@ -67,7 +71,7 @@ namespace OptimaTrackerWebService.Services
                 }
                 else
                 {
-                    Console.WriteLine(abc.ProcedureId + " do not exists in events dictionary");
+                    Console.WriteLine(abc.ProcedureName + " do not exists in events dictionary");
                 }
             }
         }
@@ -91,9 +95,9 @@ namespace OptimaTrackerWebService.Services
             return companyId;
         }
 
-        private int GetEventDefinitionId(string procedureId)
+        private int GetEventDefinitionId(string procedureName)
         {
-            int eventDefinitionId = dbContext.eventsDict.Where(d => d.ProcedureId == procedureId).Select(d => d.Id).SingleOrDefault();
+            int eventDefinitionId = dbContext.proceduresDict.Where(d => d.ProcedureName == procedureName).Select(d => d.Id).SingleOrDefault();
 
             return eventDefinitionId;
         }

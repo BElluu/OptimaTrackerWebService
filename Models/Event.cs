@@ -7,9 +7,9 @@ namespace OptimaTrackerWebService.Models
     {
         [JsonIgnore]
         public int Id { get; set; }
-        public string ProcedureId { get; set; }
+        public string ProcedureName { get; set; }
         [JsonIgnore]
-        public int ProcedureIdentity { get; set; }
+        public int ProcedureId { get; set; }
         public int NumberOfOccurrences { get; set; }
         [JsonIgnore]
         public int CompanyId { get; set; }

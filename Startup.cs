@@ -58,6 +58,9 @@ namespace OptimaTrackerWebService
             {
                 endpoints.MapControllers();
             });
+
+            DatabaseFiller databaseFiller = new DatabaseFiller(Configuration);
+            databaseFiller.FillProceduresDictIfEmpty();
         }
     }
 }
