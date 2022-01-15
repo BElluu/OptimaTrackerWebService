@@ -29,7 +29,7 @@ namespace OptimaTrackerWebService.Services
                     InsertCompanyData(data);
 
                 int companyId = GetCompanyId(data.SerialKey);
-                InsertEventsData(data, companyId);
+                InsertEventsDetailsData(data, companyId);
 
             }
             catch (Exception ex)
@@ -51,22 +51,33 @@ namespace OptimaTrackerWebService.Services
             dbContext.SaveChanges();
         }
 
-        private void InsertEventsData(Company data, int companyId)
+        private void InsertOrUpdateEventsData(Company data)
         {
             foreach (var abc in data.Events)
             {
-                var eventDefinitionId = GetEventDefinitionId(abc.ProcedureName);
-                if (eventDefinitionId != 0)
+                var eventId = GetEventDefinitionId(abc.ProcedureName);
+                if (eventId != 0)
                 {
-                    var eventData = new Event
-                    {
-                        ProcedureId = eventDefinitionId,
-                        NumberOfOccurrences = abc.NumberOfOccurrences,
-                        CompanyId = companyId,
-                        TimeStamp = DateTime.Today
+                    var eventData = dbContext.events.FirstOrDefault(myEvent => myEvent.Id == eventId);
 
-                    };
-                    dbContext.events.Add(eventData);
+                    if(eventData != null)
+                    {
+                        eventData.NumberOfOccurrences = dbContext.Entry(eventData).Property(e => e.NumberOfOccurrences).CurrentValue + abc.NumberOfOccurrences;
+                        eventData.TimeStamp = DateTime.Today;
+
+                        dbContext.events.Update(eventData);
+                    }
+                    else
+                    {
+                        var newRow = new Event
+                        {
+                            ProcedureId = eventId,
+                            NumberOfOccurrences = abc.NumberOfOccurrences,
+                            TimeStamp = DateTime.Today
+                        };
+                        dbContext.events.Add(newRow);
+                        //TODO Add new row event in table
+                    }
                     dbContext.SaveChanges();
                 }
                 else
@@ -74,6 +85,37 @@ namespace OptimaTrackerWebService.Services
                     Console.WriteLine(abc.ProcedureName + " do not exists in events dictionary");
                 }
             }
+        }
+
+        private void InsertEventsDetailsData(Company data, int companyId)
+        {
+            /*            using (var dbContext = new DatabaseContext())
+                        {
+            // TODO using dbcontext
+                        }*/
+
+            foreach (var abc in data.Events)
+            {
+                var eventDefinitionId = GetEventDefinitionId(abc.ProcedureName);
+                if (eventDefinitionId != 0)
+                {
+                    var eventData = new EventDetails
+                    {
+                        ProcedureId = eventDefinitionId,
+                        NumberOfOccurrences = abc.NumberOfOccurrences,
+                        CompanyId = companyId,
+                        TimeStamp = DateTime.Today
+
+                    };
+                    dbContext.eventsDetails.Add(eventData);
+                    dbContext.SaveChanges();
+                }
+                else
+                {
+                    Console.WriteLine(abc.ProcedureName + " do not exists in events dictionary");
+                }
+            }
+
         }
 
         private bool SerialKeyExists(string serialKey)

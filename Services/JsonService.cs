@@ -20,6 +20,7 @@ namespace OptimaTrackerWebService.Services
             using (StreamWriter file = File.CreateText(configuration["OtherSettings:JsonFilePath"]+"ERR_" + timestamp +".json"))
             {
                 JsonSerializer serializer = new JsonSerializer();
+                serializer.Formatting = Formatting.Indented;
                 serializer.Serialize(file, jsonObject);
             }
         }

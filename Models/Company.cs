@@ -10,6 +10,6 @@ namespace OptimaTrackerWebService.Models
         public string SerialKey { get; set; }
         public string TIN { get; set; }
 
-        public virtual List<Event> Events { get; set; }
+        public virtual List<EventDetails> Events { get; set; }
     }
 }
