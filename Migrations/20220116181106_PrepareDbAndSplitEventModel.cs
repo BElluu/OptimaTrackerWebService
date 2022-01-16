@@ -6,7 +6,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace OptimaTrackerWebService.Migrations
 {
-    public partial class InitMigration : Migration
+    public partial class PrepareDbAndSplitEventModel : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -25,12 +25,28 @@ namespace OptimaTrackerWebService.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Events",
+                columns: table => new
+                {
+                    EventId = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ProcedureId = table.Column<int>(type: "integer", nullable: false),
+                    NumberOfOccurrences = table.Column<int>(type: "integer", nullable: false),
+                    TimeStamp = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Events", x => x.EventId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ProceduresDict",
                 columns: table => new
                 {
                     ProcedureId = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    ProcedureName = table.Column<string>(type: "text", nullable: true)
+                    ProcedureName = table.Column<string>(type: "text", nullable: true),
+                    IsEnabled = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -38,7 +54,7 @@ namespace OptimaTrackerWebService.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Events",
+                name: "EventsDetails",
                 columns: table => new
                 {
                     EventId = table.Column<int>(type: "integer", nullable: false)
@@ -50,9 +66,9 @@ namespace OptimaTrackerWebService.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Events", x => x.EventId);
+                    table.PrimaryKey("PK_EventsDetails", x => x.EventId);
                     table.ForeignKey(
-                        name: "FK_Events_Companies_CompanyId",
+                        name: "FK_EventsDetails_Companies_CompanyId",
                         column: x => x.CompanyId,
                         principalTable: "Companies",
                         principalColumn: "CompanyId",
@@ -66,8 +82,8 @@ namespace OptimaTrackerWebService.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Events_CompanyId",
-                table: "Events",
+                name: "IX_EventsDetails_CompanyId",
+                table: "EventsDetails",
                 column: "CompanyId");
         }
 
@@ -75,6 +91,9 @@ namespace OptimaTrackerWebService.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Events");
+
+            migrationBuilder.DropTable(
+                name: "EventsDetails");
 
             migrationBuilder.DropTable(
                 name: "ProceduresDict");

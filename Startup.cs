@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using OptimaTrackerWebService.Database;
 using OptimaTrackerWebService.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace OptimaTrackerWebService
 {
@@ -21,13 +22,16 @@ namespace OptimaTrackerWebService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "OptimaTrackerWebService", Version = "v1" });
             });
-            services.AddDbContext<DatabaseContext>();
+            services.AddDbContext<DatabaseContext>(options =>
+            {
+                options.UseNpgsql(Configuration["ConnectionStrings:OptimaTrackerAppConnection"]);
+                options.EnableSensitiveDataLogging();
+            });
             services.AddScoped<IDatabaseService, DatabaseService>();
             services.AddScoped<IJsonService, JsonService>();
 
@@ -35,6 +39,8 @@ namespace OptimaTrackerWebService
             // https://github.com/npgsql/efcore.pg/issues/2000
 
             System.AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
+            services.AddAsyncInitializer<DatabaseFiller>();
 
         }
 
@@ -58,9 +64,6 @@ namespace OptimaTrackerWebService
             {
                 endpoints.MapControllers();
             });
-
-            DatabaseFiller databaseFiller = new DatabaseFiller(Configuration);
-            databaseFiller.FillProceduresDictIfEmpty();
         }
     }
 }

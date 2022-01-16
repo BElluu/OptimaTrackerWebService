@@ -2,7 +2,7 @@
 
 namespace OptimaTrackerWebService.Models
 {
-    public class Event: IEvent
+    public interface IEvent
     {
         public int Id { get; set; }
         public int ProcedureId { get; set; }
