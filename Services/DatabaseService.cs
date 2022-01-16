@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
+using OptimaTrackerWebService.Configuration;
 using OptimaTrackerWebService.Database;
 using OptimaTrackerWebService.Models;
 using System;
 using System.Linq;
-using System.Xml.Linq;
 
 namespace OptimaTrackerWebService.Services
 {
@@ -13,23 +13,36 @@ namespace OptimaTrackerWebService.Services
         private readonly IJsonService json;
         private readonly IConfiguration configuration;
 
-        public DatabaseService(DatabaseContext optimaTrackerContext, IJsonService jsonService, IConfiguration config)
+        public DatabaseService(DatabaseContext databaseContext, IJsonService jsonService, IConfiguration config)
         {
-            dbContext = optimaTrackerContext;
             json = jsonService;
+            dbContext = databaseContext;
             configuration = config;
         }
 
         public void Insert(Company data)
         {
+            if (configuration["OtherSettings:ProceduresFileLocation"] == TrackStatusEnum.BLOCKED.ToString())
+            {
+                return;
+            }
+
             try
             {
-                //throw new Exception("Test Exception");
-                if (!SerialKeyExists(data.SerialKey))
-                    InsertCompanyData(data);
+                if (configuration["OtherSettings:ProceduresFileLocation"] == TrackStatusEnum.BASIC.ToString())
+                {
+                    //throw new Exception("Test Exception");
+                    if (!SerialKeyExists(data.SerialKey))
+                        InsertCompanyData(data);
 
-                int companyId = GetCompanyId(data.SerialKey);
-                InsertEventsDetailsData(data, companyId);
+                    InsertOrUpdateEventsData(data);
+                }
+
+                if (configuration["OtherSettings:ProceduresFileLocation"] == TrackStatusEnum.EXPANDED.ToString())
+                {
+                    int companyId = GetCompanyId(data.SerialKey);
+                    InsertEventsDetailsData(data, companyId);
+                }
 
             }
             catch (Exception ex)
@@ -49,23 +62,24 @@ namespace OptimaTrackerWebService.Services
             };
             dbContext.companies.Add(companyData);
             dbContext.SaveChanges();
+
         }
 
         private void InsertOrUpdateEventsData(Company data)
         {
+
             foreach (var abc in data.Events)
             {
                 var eventId = GetEventDefinitionId(abc.ProcedureName);
                 if (eventId != 0)
                 {
-                    var eventData = dbContext.events.FirstOrDefault(myEvent => myEvent.Id == eventId);
+                    var eventData = dbContext.events.FirstOrDefault(myEvent => myEvent.ProcedureId == eventId);
 
-                    if(eventData != null)
+                    if (eventData != null)
                     {
                         eventData.NumberOfOccurrences = dbContext.Entry(eventData).Property(e => e.NumberOfOccurrences).CurrentValue + abc.NumberOfOccurrences;
                         eventData.TimeStamp = DateTime.Today;
 
-                        dbContext.events.Update(eventData);
                     }
                     else
                     {
@@ -76,7 +90,6 @@ namespace OptimaTrackerWebService.Services
                             TimeStamp = DateTime.Today
                         };
                         dbContext.events.Add(newRow);
-                        //TODO Add new row event in table
                     }
                     dbContext.SaveChanges();
                 }
@@ -89,11 +102,6 @@ namespace OptimaTrackerWebService.Services
 
         private void InsertEventsDetailsData(Company data, int companyId)
         {
-            /*            using (var dbContext = new DatabaseContext())
-                        {
-            // TODO using dbcontext
-                        }*/
-
             foreach (var abc in data.Events)
             {
                 var eventDefinitionId = GetEventDefinitionId(abc.ProcedureName);
@@ -115,7 +123,6 @@ namespace OptimaTrackerWebService.Services
                     Console.WriteLine(abc.ProcedureName + " do not exists in events dictionary");
                 }
             }
-
         }
 
         private bool SerialKeyExists(string serialKey)

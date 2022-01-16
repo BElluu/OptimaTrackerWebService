@@ -12,8 +12,8 @@ using OptimaTrackerWebService.Database;
 namespace OptimaTrackerWebService.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20220114210647_InitMigration")]
-    partial class InitMigration
+    [Migration("20220116181106_PrepareDbAndSplitEventModel")]
+    partial class PrepareDbAndSplitEventModel
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -56,6 +56,29 @@ namespace OptimaTrackerWebService.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("NumberOfOccurrences")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ProcedureId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("TimeStamp")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Events", (string)null);
+                });
+
+            modelBuilder.Entity("OptimaTrackerWebService.Models.EventDetails", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("EventId");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
                     b.Property<int>("CompanyId")
                         .HasColumnType("integer");
 
@@ -72,7 +95,7 @@ namespace OptimaTrackerWebService.Migrations
 
                     b.HasIndex("CompanyId");
 
-                    b.ToTable("Events", (string)null);
+                    b.ToTable("EventsDetails", (string)null);
                 });
 
             modelBuilder.Entity("OptimaTrackerWebService.Models.ProceduresDict", b =>
@@ -84,6 +107,9 @@ namespace OptimaTrackerWebService.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("IsEnabled")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("ProcedureName")
                         .HasColumnType("text");
 
@@ -92,7 +118,7 @@ namespace OptimaTrackerWebService.Migrations
                     b.ToTable("ProceduresDict", (string)null);
                 });
 
-            modelBuilder.Entity("OptimaTrackerWebService.Models.Event", b =>
+            modelBuilder.Entity("OptimaTrackerWebService.Models.EventDetails", b =>
                 {
                     b.HasOne("OptimaTrackerWebService.Models.Company", "Company")
                         .WithMany("Events")
