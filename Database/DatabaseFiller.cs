@@ -1,5 +1,6 @@
 ﻿using Extensions.Hosting.AsyncInitialization;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using OptimaTrackerWebService.Models;
 using System;
 using System.Linq;
@@ -12,10 +13,12 @@ namespace OptimaTrackerWebService.Database
     {
         private readonly IConfiguration configuration;
         private readonly DatabaseContext dbContext;
-        public DatabaseFiller(IConfiguration config, DatabaseContext databaseContext)
+        private readonly ILogger log;
+        public DatabaseFiller(IConfiguration config, DatabaseContext databaseContext, ILogger<DatabaseFiller> logger)
         {
             configuration = config;
             dbContext = databaseContext;
+            log = logger;
         }
 
         public async Task InitializeAsync()
@@ -37,10 +40,10 @@ namespace OptimaTrackerWebService.Database
 
                 }
                 dbContext.SaveChanges();
-                Console.WriteLine("ProceduresDict filled!");
+                log.LogInformation("ProceduresDict filled!");
                 return Task.FromResult("ProceduresDict filled!");
             }
-            Console.WriteLine("ProceduresDict is not empty!");
+            log.LogInformation("ProceduresDict is not empty!");
             return Task.FromResult("ProceduresDict is not empty!");
         }
 

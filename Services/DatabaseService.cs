@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using OptimaTrackerWebService.Configuration;
 using OptimaTrackerWebService.Database;
 using OptimaTrackerWebService.Models;
@@ -12,9 +13,11 @@ namespace OptimaTrackerWebService.Services
         private readonly DatabaseContext dbContext;
         private readonly IJsonService json;
         private readonly IConfiguration configuration;
+        private readonly ILogger log;
 
-        public DatabaseService(DatabaseContext databaseContext, IJsonService jsonService, IConfiguration config)
+        public DatabaseService(DatabaseContext databaseContext, IJsonService jsonService, IConfiguration config, ILogger<DatabaseService> logger)
         {
+            log = logger;
             json = jsonService;
             dbContext = databaseContext;
             configuration = config;
@@ -22,23 +25,26 @@ namespace OptimaTrackerWebService.Services
 
         public void Insert(Company data)
         {
-            if (configuration["OtherSettings:ProceduresFileLocation"] == TrackStatusEnum.BLOCKED.ToString())
+            log.LogInformation("Test INFO");
+            log.LogWarning("TEST Warning");
+            log.LogError("TEST ERROR");
+            if (configuration["OtherSettings:TrackStatus"] == TrackStatusEnum.BLOCKED.ToString())
             {
                 return;
             }
 
             try
             {
-                if (configuration["OtherSettings:ProceduresFileLocation"] == TrackStatusEnum.BASIC.ToString())
-                {
-                    //throw new Exception("Test Exception");
-                    if (!SerialKeyExists(data.SerialKey))
-                        InsertCompanyData(data);
+                //throw new Exception("Test Exception");
+                if (!SerialKeyExists(data.SerialKey))
+                    InsertCompanyData(data);
 
+                if (configuration["OtherSettings:TrackStatus"] == TrackStatusEnum.BASIC.ToString())
+                {
                     InsertOrUpdateEventsData(data);
                 }
 
-                if (configuration["OtherSettings:ProceduresFileLocation"] == TrackStatusEnum.EXPANDED.ToString())
+                if (configuration["OtherSettings:TrackStatus"] == TrackStatusEnum.EXPANDED.ToString())
                 {
                     int companyId = GetCompanyId(data.SerialKey);
                     InsertEventsDetailsData(data, companyId);
@@ -47,7 +53,7 @@ namespace OptimaTrackerWebService.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                log.LogError(ex.Message);
                 json.CreateJsonFromObject(data);
 
             }
@@ -95,7 +101,7 @@ namespace OptimaTrackerWebService.Services
                 }
                 else
                 {
-                    Console.WriteLine(abc.ProcedureName + " do not exists in events dictionary");
+                    log.LogError(abc.ProcedureName + " do not exists in events dictionary");
                 }
             }
         }
@@ -120,7 +126,7 @@ namespace OptimaTrackerWebService.Services
                 }
                 else
                 {
-                    Console.WriteLine(abc.ProcedureName + " do not exists in events dictionary");
+                    log.LogError(abc.ProcedureName + " do not exists in events dictionary");
                 }
             }
         }
