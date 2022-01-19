@@ -25,9 +25,6 @@ namespace OptimaTrackerWebService.Services
 
         public void Insert(Company data)
         {
-            log.LogInformation("Test INFO");
-            log.LogWarning("TEST Warning");
-            log.LogError("TEST ERROR");
             if (configuration["OtherSettings:TrackStatus"] == TrackStatusEnum.BLOCKED.ToString())
             {
                 return;
