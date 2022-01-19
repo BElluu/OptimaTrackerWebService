@@ -41,6 +41,7 @@ namespace OptimaTrackerWebService
 
             System.AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
+            services.AddAsyncInitializer<DatabaseCreator>();
             services.AddAsyncInitializer<DatabaseFiller>();
 
         }
