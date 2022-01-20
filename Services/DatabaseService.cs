@@ -44,6 +44,7 @@ namespace OptimaTrackerWebService.Services
                 if (configuration["OtherSettings:TrackStatus"] == TrackStatusEnum.EXPANDED.ToString())
                 {
                     int companyId = GetCompanyId(data.SerialKey);
+                    InsertOrUpdateEventsData(data);
                     InsertEventsDetailsData(data, companyId);
                 }
 

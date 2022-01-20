@@ -8,6 +8,7 @@ using OptimaTrackerWebService.Database;
 using OptimaTrackerWebService.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Net;
 
 namespace OptimaTrackerWebService
 {
@@ -24,6 +25,7 @@ namespace OptimaTrackerWebService
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "OptimaTrackerWebService", Version = "v1" });
@@ -31,7 +33,7 @@ namespace OptimaTrackerWebService
             services.AddDbContext<DatabaseContext>(options =>
             {
                 options.UseNpgsql(Configuration["ConnectionStrings:OptimaTrackerAppConnection"]);
-                options.EnableSensitiveDataLogging();
+                //options.EnableSensitiveDataLogging();
             });
             services.AddScoped<IDatabaseService, DatabaseService>();
             services.AddScoped<IJsonService, JsonService>();
@@ -56,6 +58,9 @@ namespace OptimaTrackerWebService
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "OptimaTrackerWebService v1"));
+            }else
+            {
+                app.UseHsts();
             }
 
             app.UseHttpsRedirection();
