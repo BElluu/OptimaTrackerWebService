@@ -33,7 +33,6 @@ namespace OptimaTrackerWebService
             services.AddDbContext<DatabaseContext>(options =>
             {
                 options.UseNpgsql(Configuration["ConnectionStrings:OptimaTrackerAppConnection"]);
-                //options.EnableSensitiveDataLogging();
             });
             services.AddScoped<IDatabaseService, DatabaseService>();
             services.AddScoped<IJsonService, JsonService>();

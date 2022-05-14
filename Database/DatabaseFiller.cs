@@ -42,7 +42,7 @@ namespace OptimaTrackerWebService.Database
             return Task.FromResult("ProceduresDict is not empty!");
         }
 
-        private string[] FillProceduresDict()
+        private static string[] FillProceduresDict()
         {
             XDocument procedureXml = XDocument.Load("procedures.xml");
             string[] procedures = procedureXml.Root.Descendants("Procedure").Select(e => e.Attribute("Name").Value).ToArray();

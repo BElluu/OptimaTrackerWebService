@@ -4,6 +4,6 @@ namespace OptimaTrackerWebService.Services
 {
     public interface IJsonService
     {
-        void CreateJsonFromObject(Company json);
+        void CreateJsonFromObject(Company company);
     }
 }

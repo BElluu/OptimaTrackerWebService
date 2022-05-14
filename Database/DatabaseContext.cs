@@ -51,12 +51,5 @@ namespace OptimaTrackerWebService.Database
                 d.Property(d => d.Id).ValueGeneratedOnAdd().UseIdentityColumn().IsRequired().HasColumnName("ProcedureId");
             });
         }
-        /*
-                protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-                {
-                    //move to startup
-                    optionsBuilder.UseNpgsql(configuration["ConnectionStrings:OptimaTrackerAppConnection"]);
-                    optionsBuilder.EnableSensitiveDataLogging();
-                }*/
     }
 }

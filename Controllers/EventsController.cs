@@ -21,11 +21,5 @@ namespace OptimaTrackerWebService.Controllers
         {
             service.Insert(data);
         }
-
-        [HttpGet]
-        public string Get()
-        {
-            return "123";
-        }
     }
 }
