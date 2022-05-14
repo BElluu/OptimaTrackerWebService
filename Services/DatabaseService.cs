@@ -25,7 +25,7 @@ namespace OptimaTrackerWebService.Services
 
         public void Insert(Company data)
         {
-            if (configuration["OtherSettings:TrackStatus"] == TrackStatusEnum.BLOCKED.ToString())
+            if (configuration["OtherSettings:TrackStatus"] == TrackStatus.BLOCKED.ToString())
             {
                 return;
             }
@@ -36,12 +36,12 @@ namespace OptimaTrackerWebService.Services
                 if (!SerialKeyExists(data.SerialKey))
                     InsertCompanyData(data);
 
-                if (configuration["OtherSettings:TrackStatus"] == TrackStatusEnum.BASIC.ToString())
+                if (configuration["OtherSettings:TrackStatus"] == TrackStatus.BASIC.ToString())
                 {
                     InsertOrUpdateEventsData(data);
                 }
 
-                if (configuration["OtherSettings:TrackStatus"] == TrackStatusEnum.EXPANDED.ToString())
+                if (configuration["OtherSettings:TrackStatus"] == TrackStatus.EXPANDED.ToString())
                 {
                     int companyId = GetCompanyId(data.SerialKey);
                     InsertOrUpdateEventsData(data);

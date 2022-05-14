@@ -1,6 +1,6 @@
 ﻿namespace OptimaTrackerWebService.Configuration
 {
-    public enum TrackStatusEnum
+    public enum TrackStatus
     {
         BASIC,
         EXPANDED,

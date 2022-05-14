@@ -14,14 +14,14 @@ namespace OptimaTrackerWebService.Services
         {
             configuration = config;
         }
-        public void CreateJsonFromObject(Company jsonObject)
+        public void CreateJsonFromObject(Company company)
         {
             string timestamp = (DateTime.UtcNow.Subtract(DateTime.UnixEpoch).TotalSeconds).ToString();
             using (StreamWriter file = File.CreateText(configuration["OtherSettings:JsonFilePath"]+"ERR_" + timestamp +".json"))
             {
                 JsonSerializer serializer = new JsonSerializer();
                 serializer.Formatting = Formatting.Indented;
-                serializer.Serialize(file, jsonObject);
+                serializer.Serialize(file, company);
             }
         }
     }
